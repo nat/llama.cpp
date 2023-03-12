@@ -827,6 +827,14 @@ void onmessage(ws_cli_conn_t *client,
 
             // add it to the context
             embd.push_back(id);
+
+            // display text
+            for (auto id : embd) {
+                // don't send it if we're still in the prompt
+                ws_sendframe_txt(client, vocab.id_to_token[id].c_str());
+                printf("%s", vocab.id_to_token[id].c_str());
+            }
+            fflush(stdout);
         } else {
             // if here, it means we are still processing the input prompt
             for (int k = i; k < embd_inp.size(); k++) {
@@ -837,13 +845,6 @@ void onmessage(ws_cli_conn_t *client,
             }
             i += embd.size() - 1;
         }
-
-        // display text
-        for (auto id : embd) {
-            ws_sendframe_txt(client, vocab.id_to_token[id].c_str());
-            printf("%s", vocab.id_to_token[id].c_str());
-        }
-        fflush(stdout);
 
         // end of text token
         if (embd.back() == 2) {
