@@ -18,6 +18,7 @@ models/*
 
 /main
 /quantize
+/server
 
 arm_neon.h
 compile_commands.json
