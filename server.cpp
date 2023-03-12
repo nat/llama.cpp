@@ -887,38 +887,17 @@ int main(int argc, char ** argv) {
         t_load_us = ggml_time_us() - t_start_us;
     }
 
-    // Web server
-    if (1) {
-        struct ws_events evs;
-        evs.onopen    = &onopen;
-        evs.onclose   = &onclose;
-        evs.onmessage = &onmessage;
+    struct ws_events evs;
+    evs.onopen    = &onopen;
+    evs.onclose   = &onclose;
+    evs.onmessage = &onmessage;
 
-        /*
-        * Main loop, this function never* returns.
-        *
-        * *If the third argument is != 0, a new thread is created
-        * to handle new connections.
-        */
-        ws_socket(&evs, 8080, 0, 1000);
-
-        return (0);
-    }
-
-
-    // report timing
-    {
-        const int64_t t_main_end_us = ggml_time_us();
-
-        printf("\n\n");
-//        printf("%s: mem per token = %8zu bytes\n", __func__, mem_per_token);
-        printf("%s:     load time = %8.2f ms\n", __func__, t_load_us/1000.0f);
-        printf("%s:   sample time = %8.2f ms\n", __func__, t_sample_us/1000.0f);
-        printf("%s:  predict time = %8.2f ms / %.2f ms per token\n", __func__, t_predict_us/1000.0f, t_predict_us/1000.0f/n_past);
-        printf("%s:    total time = %8.2f ms\n", __func__, (t_main_end_us - t_main_start_us)/1000.0f);
-    }
-
-    ggml_free(model.ctx);
-
+    /*
+    * Main loop, this function never* returns.
+    *
+    * *If the third argument is != 0, a new thread is created
+    * to handle new connections.
+    */
+    ws_socket(&evs, 10811, 0, 1000);
     return 0;
 }
