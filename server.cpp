@@ -764,6 +764,58 @@ void onmessage(ws_cli_conn_t *client,
 {
     char *cli;
     cli = ws_getaddress(client);
+
+    // The first line contains the parameters, in this format:
+    // temperature:top_p:top_k:max_tokens
+    // This terminates in a newline. The prompt follows.
+
+    char *p = (char *) msg;
+    char *q = strchr(p, '\n');
+    if (q == NULL) {
+        printf("Invalid parameters: %s\n", p);
+        return;
+    }
+    *q = '\0';
+    q++;
+
+    printf("Parameters: %s\n", p);
+
+    char *r = strchr(p, ':');
+    if (r == NULL) {
+        printf("Invalid parameters: %s\n", p);
+        return;
+    }
+    *r = '\0';
+    r++;
+    params.temp = atof(p);
+
+    p = strchr(r, ':');
+    if (p == NULL) {
+        printf("Invalid parameters: %s\n", r);
+        return;
+    }
+    *p = '\0';
+    p++;
+    params.top_p = atof(r);
+
+    r = strchr(p, ':');
+    if (r == NULL) {
+        printf("Invalid parameters: %s\n", p);
+        return;
+    }
+    *r = '\0';
+    r++;
+    params.top_k = atoi(p);
+
+    params.n_predict = atoi(r);
+
+    // Print the params
+    printf("temp: %f, top_p: %f, top_k: %d, n_predict: %d\n",
+        params.temp, params.top_p, params.top_k, params.n_predict);
+
+    // Now get the prompt
+    msg = (const unsigned char *) q;
+
     printf("Prompt received: \"%s\" from: %s\n", msg, cli);
 
     params.prompt = (char *) msg;
@@ -830,7 +882,6 @@ void onmessage(ws_cli_conn_t *client,
 
             // display text
             for (auto id : embd) {
-                // don't send it if we're still in the prompt
                 ws_sendframe_txt(client, vocab.id_to_token[id].c_str());
                 printf("%s", vocab.id_to_token[id].c_str());
             }
