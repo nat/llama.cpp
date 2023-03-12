@@ -191,8 +191,12 @@ main: main.cpp ggml.o utils.o
 	$(CXX) $(CXXFLAGS) main.cpp ggml.o utils.o -o main $(LDFLAGS)
 	./main -h
 
+wsServer/libws.a:
+	git submodule update --init --recursive
+	cd wsServer && make
+
 server: server.cpp ggml.o utils.o wsServer/libws.a
-	$(CXX) $(CXXFLAGS) server.cpp ggml.o utils.o wsServer/libws.a -o server $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) server.cpp ggml.o utils.o wsServer/libws.a -o server $(LDFLAGS) -liconv
 	./server -h
 
 quantize: quantize.cpp ggml.o utils.o
